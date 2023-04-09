@@ -5,10 +5,12 @@ from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from requests import get
 from yaml import load as load_yaml, Loader
-from backend.models import Shop, Category, ProductInfo, Product, Parameter, ProductParameter
+from backend.models import Shop, Category, ProductInfo, Product, Parameter, ProductParameter,ConfirmEmailToken
 from django.contrib.auth.password_validation import validate_password
 from backend.serializers import UserSerializer
 from backend.signals import new_user_registered
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
 
 
 class PartnerUpdate(APIView):
@@ -96,5 +98,47 @@ class RegisterAccount(APIView):
                     return JsonResponse({'Status': True})
                 else:
                     return JsonResponse({'Status': False, 'Errors': user_serializer.errors})
+
+        return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
+
+class ConfirmAccount(APIView):
+    """
+    Класс для подтверждения почтового адреса
+    """
+    # Регистрация методом POST
+    def post(self, request, *args, **kwargs):
+
+        # проверяем обязательные аргументы
+        if {'email', 'token'}.issubset(request.data):
+
+            token = ConfirmEmailToken.objects.filter(user__email=request.data['email'],
+                                                     key=request.data['token']).first()
+            if token:
+                token.user.is_active = True
+                token.user.save()
+                token.delete()
+                return JsonResponse({'Status': True})
+            else:
+                return JsonResponse({'Status': False, 'Errors': 'Неправильно указан токен или email'})
+
+        return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
+
+class LoginAccount(APIView):
+    """
+    Класс для авторизации пользователей
+    """
+    # Авторизация методом POST
+    def post(self, request, *args, **kwargs):
+
+        if {'email', 'password'}.issubset(request.data):
+            user = authenticate(request, username=request.data['email'], password=request.data['password'])
+
+            if user is not None:
+                if user.is_active:
+                    token, _ = Token.objects.get_or_create(user=user)
+
+                    return JsonResponse({'Status': True, 'Token': token.key})
+
+            return JsonResponse({'Status': False, 'Errors': 'Не удалось авторизовать'})
 
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
