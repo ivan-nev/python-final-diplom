@@ -93,6 +93,9 @@ class User(AbstractUser):
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
+    # def set_password(self, raw_password):
+    #     super().set_password(self)
+    #     # User.auth_token.delete()
 
 
     class Meta:
