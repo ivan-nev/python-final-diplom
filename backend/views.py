@@ -20,6 +20,8 @@ from rest_framework.generics import ListAPIView
 from django.db.models import Q, Sum, F
 from ujson import loads as load_json
 from django.db import IntegrityError
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.filters import SearchFilter
 
 class PartnerUpdate(APIView):
     """
@@ -208,6 +210,16 @@ class ShopView(ListAPIView):
     queryset = Shop.objects.filter(state=True)
     serializer_class = ShopSerializer
 
+class ShopView1(ModelViewSet):
+    """
+    Класс для просмотра списка магазинов
+    """
+    queryset = Shop.objects.all()
+    serializer_class = ShopSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ['name', 'id']
+
+
 
 class ProductInfoView(APIView):
     """
@@ -225,7 +237,7 @@ class ProductInfoView(APIView):
         if category_id:
             query = query & Q(product__category_id=category_id)
 
-        # фильтруем и отбрасываем дуликаты
+        # фильтруем и отбрасываем дубликаты
         queryset = ProductInfo.objects.filter(
             query).select_related(
             'shop', 'product__category').prefetch_related(
@@ -233,6 +245,34 @@ class ProductInfoView(APIView):
 
         serializer = ProductInfoSerializer(queryset, many=True)
 
+        return Response(serializer.data)
+
+class ProductInfoView1(ModelViewSet):
+    queryset = ProductInfo.objects.all()
+    serializer_class = ProductInfoSerializer
+    # filter_backends = [SearchFilter]
+    # search_fields = ['shop']
+    # # filterset_fields = ['category']
+    """
+    Класс для поиска товаров
+    """
+
+    def get(self, request, *args, **kwargs):
+        query = Q(shop__state=True)
+        shop_id = request.query_params.get('shop_id')
+        category_id = request.query_params.get('category_id')
+
+        if shop_id:
+            query = query & Q(shop_id=shop_id)
+
+        if category_id:
+            query = query & Q(product__category_id=category_id)
+
+        queryset = ProductInfo.objects.filter(
+            query).select_related(
+            'shop', 'product__category').prefetch_related(
+            'product_parameters__parameter').distinct()
+        serializer = ProductInfoSerializer(queryset, many=True)
         return Response(serializer.data)
 
 

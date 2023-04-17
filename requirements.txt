@@ -4,3 +4,4 @@ django-rest-passwordreset
 requests
 pyyaml
 ujson
+django-filter
