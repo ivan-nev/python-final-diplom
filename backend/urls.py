@@ -7,6 +7,7 @@ from backend.views import PartnerUpdate, RegisterAccount, ConfirmAccount, LoginA
 from rest_framework.routers import DefaultRouter
 
 
+
 r = DefaultRouter()
 r.register('products1', ProductInfoView1)
 r.register('shops1', ShopView1)
@@ -25,8 +26,8 @@ urlpatterns += [
     path('user/password_reset', reset_password_request_token, name='password-reset'),
     path('user/password_reset/confirm', reset_password_confirm, name='password-reset-confirm'),
     path('categories', CategoryView.as_view(), name='categories'),
-    path('shops', ShopView.as_view(), name='shops'),
-    path('products', ProductInfoView.as_view(), name='shops'),
+    path('backend', ShopView.as_view(), name='backend'),
+    path('products', ProductInfoView.as_view(), name='backend'),
     path('basket', BasketView.as_view(), name='basket'),
     path('order', OrderView.as_view(), name='order'),
 
