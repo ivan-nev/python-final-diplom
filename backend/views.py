@@ -22,6 +22,7 @@ from ujson import loads as load_json
 from django.db import IntegrityError
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import SearchFilter
+from rest_framework.status import HTTP_200_OK, HTTP_401_UNAUTHORIZED, HTTP_201_CREATED, HTTP_403_FORBIDDEN
 
 class PartnerUpdate(APIView):
     """
@@ -29,10 +30,10 @@ class PartnerUpdate(APIView):
     """
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
 
         if request.user.type != 'shop':
-            return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, HTTP_401_UNAUTHORIZED)
 
         url = request.data.get('url')
         if url:
@@ -105,7 +106,7 @@ class RegisterAccount(APIView):
                     user.set_password(request.data['password'])
                     user.save()
                     new_user_registered.send(sender=self.__class__, user_id=user.id)
-                    return JsonResponse({'Status': True})
+                    return JsonResponse({'Status': True}, status=HTTP_201_CREATED)
                 else:
                     return JsonResponse({'Status': False, 'Errors': user_serializer.errors})
 
@@ -162,7 +163,7 @@ class AccountDetails(APIView):
     # получить данные
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
 
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
@@ -170,7 +171,7 @@ class AccountDetails(APIView):
     # Редактирование методом POST
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
         # проверяем обязательные аргументы
 
         if 'password' in request.data:
@@ -284,7 +285,7 @@ class BasketView(APIView):
     # получить корзину
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
         basket = Order.objects.filter(
             user_id=request.user.id, state='basket').prefetch_related(
             'ordered_items__product_info__product__category',
@@ -297,7 +298,7 @@ class BasketView(APIView):
     # редактировать корзину
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
 
         items_sting = request.data.get('items')
         if items_sting:
@@ -329,7 +330,7 @@ class BasketView(APIView):
     # удалить товары из корзины
     def delete(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
 
         items_sting = request.data.get('items')
         if items_sting:
@@ -350,7 +351,7 @@ class BasketView(APIView):
     # добавить позиции в корзину
     def put(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
 
         items_sting = request.data.get('items')
         if items_sting:
@@ -379,10 +380,10 @@ class PartnerState(APIView):
     # получить текущий статус
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
 
         if request.user.type != 'shop':
-            return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=HTTP_401_UNAUTHORIZED)
 
         shop = request.user.shop
         serializer = ShopSerializer(shop)
@@ -391,10 +392,10 @@ class PartnerState(APIView):
     # изменить текущий статус
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
 
         if request.user.type != 'shop':
-            return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=HTTP_401_UNAUTHORIZED)
         state = request.data.get('state')
         if state:
             try:
@@ -412,10 +413,10 @@ class PartnerOrders(APIView):
     """
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
 
         if request.user.type != 'shop':
-            return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=HTTP_401_UNAUTHORIZED)
 
         order = Order.objects.filter(
             ordered_items__product_info__shop__user_id=request.user.id).exclude(state='basket').prefetch_related(
@@ -435,7 +436,7 @@ class ContactView(APIView):
     # получить мои контакты
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
         contact = Contact.objects.filter(
             user_id=request.user.id)
         serializer = ContactSerializer(contact, many=True)
@@ -444,7 +445,7 @@ class ContactView(APIView):
     # добавить новый контакт
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
 
         if {'city', 'street', 'phone'}.issubset(request.data):
             request.data._mutable = True
@@ -462,7 +463,7 @@ class ContactView(APIView):
     # удалить контакт
     def delete(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
 
         items_sting = request.data.get('items')
         if items_sting:
@@ -482,7 +483,7 @@ class ContactView(APIView):
     # редактировать контакт
     def put(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
 
         if 'id' in request.data:
             if request.data['id'].isdigit():
@@ -507,7 +508,7 @@ class OrderView(APIView):
     # получить мои заказы
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
         order = Order.objects.filter(
             user_id=request.user.id).exclude(state='basket').prefetch_related(
             'ordered_items__product_info__product__category',
@@ -520,7 +521,7 @@ class OrderView(APIView):
     # разместить заказ из корзины
     def post(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=403)
+            return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
 
         if {'id', 'contact'}.issubset(request.data):
             if request.data['id'].isdigit():
