@@ -16,6 +16,14 @@ def test_category_get(api_client, category_factory):
     assert response.status_code == 200
     assert (response.data['count']) == 5
 
+@pytest.mark.django_db
+def test_shop_get(api_client, shop_factory):
+    url = reverse('backend:shops1-list')
+    shop_factory(_quantity=10)
+    response = api_client.get(url)
+    assert response.status_code == 200
+    assert (response.data['count']) == 10
+
 
 @pytest.mark.django_db
 def test_user_create(api_client):
@@ -101,3 +109,37 @@ def test_user_details(api_client, user_factory):
     resp = api_client.post(url, data={"type": "shop"})
     resp = api_client.get(url)
     assert resp.json().get('type') == "shop"
+
+@pytest.mark.django_db
+def test_products(api_client, user_factory, shop_factory, order_factory,
+                  product_info_factory, product_factory, category_factory):
+
+    url = reverse("backend:shops")
+    shop = shop_factory()
+    customer = user_factory()
+    category = category_factory()
+    prod = product_factory(category=category)
+    prod_info = product_info_factory(product=prod, shop=shop)
+    api_client.force_authenticate(user=customer)
+    resp = api_client.get(url, shop_id=shop.id, category_id=category.id)
+    assert resp.status_code == HTTP_200_OK
+    assert resp.json().get('results')[0].get('name') == shop.name
+
+@pytest.mark.django_db
+def test_partner_upload(api_client, user_factory, shop_factory, category_factory, product_info_factory, product_factory):
+    price = 'https://raw.githubusercontent.com/netology-code/pd-diplom/master/data/shop1.yaml'
+    url = reverse("backend:partner-update")
+    u = user_factory()
+    api_client.force_authenticate(user=u)
+    u.is_active = True
+    u.type = 'shop'
+    u.save()
+
+    shop = shop_factory()
+    category = category_factory()
+
+    prod = product_factory(category=category)
+    prod_info = product_info_factory(product=prod, shop=shop)
+
+    resp = api_client.post(url, data={"url": price})
+

@@ -1,6 +1,7 @@
 import pytest
 from rest_framework.test import APIClient
 from model_bakery import baker
+from backend.models import Shop
 
 
 
@@ -14,6 +15,7 @@ def api_client():
 @pytest.fixture
 def category_factory():
     def factory(**kwargs):
+        # shop_set = baker.prepare(Shop, _quantity=1)
         return baker.make('backend.Category', **kwargs)
     return factory
 
@@ -35,7 +37,7 @@ def confirm_email_token_factory():
 @pytest.fixture
 def shop_factory():
     def factory(**kwargs):
-        return baker.make('backend.Shop', **kwargs)
+        return baker.make('backend.Shop',make_m2m=True, **kwargs)
     return factory
 
 

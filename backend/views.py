@@ -20,7 +20,7 @@ from rest_framework.generics import ListAPIView
 from django.db.models import Q, Sum, F
 from ujson import loads as load_json
 from django.db import IntegrityError
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.filters import SearchFilter
 from rest_framework.status import HTTP_200_OK, HTTP_401_UNAUTHORIZED, HTTP_201_CREATED, HTTP_403_FORBIDDEN
 
@@ -211,7 +211,7 @@ class ShopView(ListAPIView):
     queryset = Shop.objects.filter(state=True)
     serializer_class = ShopSerializer
 
-class ShopView1(ModelViewSet):
+class ShopView1(ReadOnlyModelViewSet):
     """
     Класс для просмотра списка магазинов
     """

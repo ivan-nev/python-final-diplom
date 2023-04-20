@@ -10,7 +10,7 @@ from rest_framework.routers import DefaultRouter
 
 r = DefaultRouter()
 r.register('products1', ProductInfoView1)
-r.register('shops1', ShopView1)
+r.register('shops1', ShopView1, basename='shops1')
 urlpatterns = r.urls
 
 app_name = 'backend'
