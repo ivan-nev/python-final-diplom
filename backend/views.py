@@ -33,7 +33,7 @@ class PartnerUpdate(APIView):
             return JsonResponse({'Status': False, 'Error': 'Log in required'}, status=HTTP_401_UNAUTHORIZED)
 
         if request.user.type != 'shop':
-            return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, HTTP_401_UNAUTHORIZED)
+            return JsonResponse({'Status': False, 'Error': 'Только для магазинов'}, status=HTTP_403_FORBIDDEN)
 
         url = request.data.get('url')
         if url:

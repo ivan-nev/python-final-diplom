@@ -8,6 +8,8 @@ from rest_framework.routers import DefaultRouter
 
 
 
+
+
 r = DefaultRouter()
 r.register('products1', ProductInfoView1)
 r.register('shops1', ShopView1, basename='shops1')
@@ -30,5 +32,6 @@ urlpatterns += [
     path('products', ProductInfoView.as_view(), name='products'),
     path('basket', BasketView.as_view(), name='basket'),
     path('order', OrderView.as_view(), name='order'),
+
 
 ]

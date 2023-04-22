@@ -26,7 +26,7 @@ def test_shop_get(api_client, shop_factory):
 
 
 @pytest.mark.django_db
-def test_user_create(api_client):
+def test_user_create(api_client, user_factory):
     some_user = {
         "first_name": "HJK",
         "last_name": "test",
@@ -41,6 +41,14 @@ def test_user_create(api_client):
     resp = api_client.post(url, data=some_user)
     assert resp.status_code == HTTP_201_CREATED
     assert resp.json().get('Status') is True
+    resp = api_client.post(url, data=some_user)
+    assert resp.status_code == HTTP_200_OK
+    assert resp.json().get('Status') is False
+    some_user['email']= 'ert@ya.ru'
+    some_user['password'] = '1111'
+    resp = api_client.post(url, data=some_user)
+    assert resp.status_code == HTTP_200_OK
+    assert resp.json().get('Status') is False
 
 
 @pytest.mark.django_db
@@ -130,16 +138,14 @@ def test_partner_upload(api_client, user_factory, shop_factory, category_factory
     price = 'https://raw.githubusercontent.com/netology-code/pd-diplom/master/data/shop1.yaml'
     url = reverse("backend:partner-update")
     u = user_factory()
+    resp = api_client.post(url, data={"url": price})
+    assert resp.status_code == HTTP_401_UNAUTHORIZED
     api_client.force_authenticate(user=u)
-    u.is_active = True
+    resp = api_client.post(url, data={"url": price})
+    assert resp.status_code == HTTP_403_FORBIDDEN
     u.type = 'shop'
     u.save()
-
-    shop = shop_factory()
-    category = category_factory()
-
-    prod = product_factory(category=category)
-    prod_info = product_info_factory(product=prod, shop=shop)
-
     resp = api_client.post(url, data={"url": price})
+    assert resp.status_code == HTTP_200_OK
+    assert resp.json().get('Status') == True
 

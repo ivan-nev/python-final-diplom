@@ -30,22 +30,25 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'backend.apps.BackendConfig',
-    'rest_framework',
     'rest_framework.authtoken',
     'django_rest_passwordreset',
+    'django.contrib.sites',
+    'backend.apps.BackendConfig',
     'drf_spectacular',
+    'drf_spectacular_sidecar',
     'django_filters',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.telegram',
 ]
 
 MIDDLEWARE = [
@@ -179,6 +182,15 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 
+
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '10000/minute',
+        'anon': '1000/minute',
+    }
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
@@ -188,7 +200,6 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Project for orders',
     'VERSION': '1.0.0',
 }
-
 
 SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
