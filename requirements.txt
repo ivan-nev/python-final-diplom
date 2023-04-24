@@ -8,7 +8,6 @@ django-filter
 pytest
 pytest-django
 model_bakery
-drf-spectacular==0.21.2
-drf-spectacular-sidecar==2022.3.14
+drf-spectacular
 django-allauth
 pytest-cov

@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'drf_spectacular',
-    'drf_spectacular_sidecar',
+    # 'drf_spectacular_sidecar',
     'rest_framework.authtoken',
     'django_rest_passwordreset',
     'allauth',
