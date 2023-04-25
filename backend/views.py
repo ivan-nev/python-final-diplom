@@ -539,3 +539,7 @@ class OrderView(APIView):
                         return JsonResponse({'Status': True})
 
         return JsonResponse({'Status': False, 'Errors': 'Не указаны все необходимые аргументы'})
+
+def  homepage(request):
+    return  render(request=request,
+    template_name= 'home.html',)

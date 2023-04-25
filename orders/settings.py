@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     # 'drf_spectacular_sidecar',
     'rest_framework.authtoken',
     'django_rest_passwordreset',
+    'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -160,6 +161,15 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 
+'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '10/day',
+        'user': '1000/day'
+    }
+
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
@@ -170,23 +180,23 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
 }
 
+
+LOGIN_REDIRECT_URL = 'homepage'
+LOGOUT_REDIRECT_URL = 'homepage'
 SITE_ID = 1
-LOGIN_REDIRECT_URL = '/'
-ACCOUNT_EMAIL_VERIFICATION = 'none'
-ACCOUNT_USERNAME_REQUIRED = False
-SOCIALACCOUNT_AUTO_SIGNUP = False
-SOCIALACCOUNT_FORMS = {'signup': 'api.forms.UserSignupForm'}
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
+        # For each OAuth based provider, either add a ``SocialApp``
+        # (``socialaccount`` app) containing the required client
+        # credentials, or list them here:
+        'APP': {
+            'client_id': '123',
+            'secret': '123',
+            'key': '13'
         }
     }
 }
+
 # R_HOST = 'localhost'
 # R_PORT = '6379'
 # CELERY_BROKER_URL = 'redis://' + R_HOST + ':' + R_PORT + '/0'
