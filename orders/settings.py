@@ -197,7 +197,7 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# R_HOST = 'localhost'
-# R_PORT = '6379'
-# CELERY_BROKER_URL = 'redis://' + R_HOST + ':' + R_PORT + '/0'
-# CELERY_RESULT_BACKEND = 'redis://' + R_HOST + ':' + R_PORT + '/0'
+R_HOST = 'localhost'
+R_PORT = '6379'
+CELERY_BROKER_URL = 'redis://' + R_HOST + ':' + R_PORT + '/0'
+CELERY_RESULT_BACKEND = 'redis://' + R_HOST + ':' + R_PORT + '/0'
