@@ -167,3 +167,37 @@
 1. Создать docker-файл для сборки приложения.
 2. Предоставить инструкцию для сборки docker-образа.
 3. Создать docker-compose файл для развертывания приложения локально (с БД и необходимыми сервисами)
+
+
+### Для запуска проекта необходимо:
+
+Установить зависимости:
+
+```bash
+pip install -r requirements.txt
+```
+
+Вам необходимо будет создать базу и прогнать миграции:
+
+```bash
+manage.py makemigrations
+manage.py migrate
+manage.py createsuperuser
+```
+
+Выполнить команду:
+
+```bash
+python manage.py runserver
+```
+### Прописать адрес Redis сервера в settings 
+
+Выполнить команду в втором терминале:
+
+```bash
+celery -A orders worker 
+```
+Запустить тесты:
+```bash
+pytest
+```

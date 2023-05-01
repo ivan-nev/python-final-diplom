@@ -10,7 +10,7 @@ new_user_registered = Signal('user_id')
 
 new_order = Signal('user_id')
 
-# @app.task()
+@app.task()
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, **kwargs):
     """
@@ -36,7 +36,7 @@ def password_reset_token_created(sender, instance, reset_password_token, **kwarg
     )
     msg.send()
 
-
+@app.task()
 @receiver(new_user_registered)
 def new_user_registered_signal(user_id, **kwargs):
     """
@@ -57,7 +57,7 @@ def new_user_registered_signal(user_id, **kwargs):
     )
     msg.send()
 
-
+@app.task()
 @receiver(new_order)
 def new_order_signal(user_id, **kwargs):
     """
