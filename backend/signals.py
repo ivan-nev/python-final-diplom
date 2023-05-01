@@ -4,12 +4,13 @@ from django.dispatch import receiver, Signal
 from django_rest_passwordreset.signals import reset_password_token_created
 
 from backend.models import ConfirmEmailToken, User
+from orders.celery import app
 
 new_user_registered = Signal('user_id')
 
 new_order = Signal('user_id')
 
-
+# @app.task()
 @receiver(reset_password_token_created)
 def password_reset_token_created(sender, instance, reset_password_token, **kwargs):
     """
